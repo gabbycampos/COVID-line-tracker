@@ -21,3 +21,7 @@ class FavoriteForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     """Delete form -- this form is intentionally blank."""
+
+class PlaceForm(FlaskForm):
+    name = StringField("Name", validators=[InputRequired("Enter Place Name")])
+    location = StringField("City (optional)", validators=[Optional("Enter City")])

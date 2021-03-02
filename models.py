@@ -50,12 +50,13 @@ class Favorite(db.Model):
     name = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.String(20), db.ForeignKey("users.email"))
-    business_id = db.Column(db.Integer, db.ForeignKey("businesses.id"))
+    place_id = db.Column(db.Integer, db.ForeignKey("places.id"))
 
-class Business(db.Model):
+class Place(db.Model):
     """ For search results of a business """
-    __tablename__ = "businesses"
+    __tablename__ = "places"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20))
-    google_id = db.Column(db.Integer, nullable=False)
+    google_id = db.Column(db.Integer)
+    address = db.Column(db.String(50))

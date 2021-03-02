@@ -1,6 +1,23 @@
 {% extends 'base.html'%}
 
 {% block content %}
-<h1> This is where a users favorite lists will go</h1>
-<p>and a search form as well for the logged in users.</p>
+<h3>My Lists</h3>
+<p> This is where a users favorite lists will go</p>
+
+<!-- doesn't go to page yet-->
+<form>
+    {{form.hidden_tag()}}
+    <button class="bt btn-info" formmethod="POST" formaction="/users/{{ user.email }}/search">
+        Go to Search Form             
+    </button>
+</form>
+
+<ul>
+    {% for favorite in favorites %}
+    <li>
+        <p>{{ favorite.name }}</p>
+    </li>
+    {% endfor %}
+</ul>
+
 {% endblock %}

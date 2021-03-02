@@ -1,0 +1,22 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+<div>
+    {% if result %}
+    <p>{{result['name']}} 
+        <a class="btn btn-primary" href="/users/add_to_list">Add to list</a> 
+        | 
+        <a class="btn btn-primary" href="/users/new_list">Make a list</a></p>
+    <p>{{result['address']}}</p>
+    <p>(estimate wait time will be here)</p>
+    {% endif %}
+</div>
+<div>
+    <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
+     <- 6ft ->
+    <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
+    <i class="fas fa-door-open"></i>
+</div>
+
+{% endblock %}
