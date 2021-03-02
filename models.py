@@ -20,7 +20,7 @@ class User(db.Model):
     last_name = db.Column(db.String(30), nullable=False)
 
     # if a user is deleted then delete their favorite lists too.
-    favorites = db.relationship("Favorite", backref="user", cascade="all, delete")
+    favorites = db.relationship("Favorite", backref="users", cascade="all, delete")
 
     @classmethod
     def register(cls, email, password, first_name, last_name):
@@ -58,5 +58,5 @@ class Place(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20))
-    google_id = db.Column(db.Integer)
+    google_id = db.Column(db.String(50))
     address = db.Column(db.String(50))
