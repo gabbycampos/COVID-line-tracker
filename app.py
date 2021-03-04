@@ -18,11 +18,41 @@ app.config["SECRET_KEY"] = "covidsecretapp"
 connect_db(app)
 db.create_all()
 
-##################### REGISTER AND LOGIN routes ####################################
+#################### HOME PAGE AND HOMEPAGE-SEARCH FORM ############################
 @app.route('/')
 def home_page():
-    return render_template('home.html')
+    form = PlaceForm()
+    return render_template('home.html', form=form, button="Search")
 
+@app.route('/', methods=["GET", "POST"])
+def get_place():
+    """ Shows search form and process it """
+    form = PlaceForm()
+     
+    if form.validate_on_submit():
+        query = form.name.data
+        location = form.location.data
+        response = requests.get(f'{API_BASE_URL}/json?input={query}&inputtype=textquery&fields=place_id,name,formatted_address&key={key}')
+        data = response.json()
+
+        result = {
+            'name': data['candidates'][0]['name'],
+            'address': data['candidates'][0]['formatted_address'],
+            'place_id': data['candidates'][0]['place_id']
+        }
+        #print(result['name'])
+
+        place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
+
+        db.session.add(place)
+        db.session.commit()
+
+        return render_template('/home.html', form=form, place=place, button="Search")
+    else:
+        return redirect("/", form=form, button="Search")
+
+
+##################### REGISTER AND LOGIN routes ####################################
 @app.route('/register', methods=["GET", "POST"])
 def register():
     """ Register a user. Form and handle register"""
@@ -78,20 +108,22 @@ def logout():
     return redirect("/")
 
 
-##################### user and search/google api routes ####################################
+##################### User's FAVORITE LISTS PAGE and SEARCH FORM ####################################
 @app.route('/users/<email>', methods=["GET", "POST"])
 def show_favorites(email):
     """ Shows a users lists of favorites & button to search form"""
+    favorites = Favorite.query.all()
+
     if 'email' not in session or email != session['email']:
         raise Unauthorized()
     
     user = User.query.get(email)
     form = DeleteForm()
 
-    return render_template("/favorites.html", user=user, form=form, button='Go To Search Form')
+    return render_template("/favorites.html", user=user, favorites=favorites, form=form, button='Go To Search Form')
 
 @app.route('/users/<email>/search', methods=["GET", "POST"])
-def get_place(email):
+def get_search_form(email):
     """ Shows search form and process it """
     if 'email' not in session or email != session['email']:
         raise Unauthorized()
@@ -112,30 +144,26 @@ def get_place(email):
         }
         #print(result['name'])
 
-        # place = Place(name=name, address=address, place_id=place_id)
+        place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
 
-        # db.session.add(place)
-        # db.session.commit()
+        db.session.add(place)
+        db.session.commit()
 
-        return render_template('/results.html', result=result)
+        return render_template('/results.html', form=form, place=place, user=user, button="Search")
     else:
         return render_template("/search_form.html", user=user, form=form, button="Search")
 
-######################## LISTS & NEW LIST & ADD TO LIST ###########################################
-@app.route("/favorites")
-def show_all_playlists():
-    """Return a list of favorite lists."""
 
-    favorites = Favorite.query.all()
-    return render_template("favorites.html", favorites=favorites)
-
-@app.route('/users/new_list', methods=['GET', 'POST'])
-def add_list():
+######################## NEW LIST & LIST DETAILS & ADD TO LIST #####################################################
+@app.route('/users/<email>/add_list', methods=['GET', 'POST'])
+def add_list(email):
     """ Makes a new list. If valid redirect to a user's list of lists """
-    # if 'email' not in session or email != session['email']:
-    #     raise Unauthorized()
+    favorites = Favorite.query.all()
 
-    # user = User.query.get(email)
+    if 'email' not in session or email != session['email']:
+        raise Unauthorized()
+
+    user = User.query.get(email)
     form = FavoriteForm()
 
     if form.validate_on_submit():
@@ -146,10 +174,13 @@ def add_list():
 
         db.session.add(new_list)
         db.session.commit()
-        return redirect("/favorites")
-    return render_template('new_list.html', form=form, button="Add")
+        return redirect(f"/users/{email}", favorite=favorites)
+    return render_template('new_list.html', form=form, user=user, button="Add")
+
+@app.route('/users/<int:')
+def list_details():
+    """ Shows a users list details"""
 
 @app.route('/users/add_to_list', methods=['GET', 'POST'])
 def add_place():
     """ Add a place to an existing list """
-

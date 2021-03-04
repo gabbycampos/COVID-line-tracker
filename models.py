@@ -57,6 +57,6 @@ class Place(db.Model):
     __tablename__ = "places"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(20))
-    google_id = db.Column(db.String(50))
-    address = db.Column(db.String(50))
+    name = db.Column(db.String(100))
+    google_id = db.Column(db.String(100))
+    address = db.Column(db.String(150))

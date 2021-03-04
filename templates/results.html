@@ -3,20 +3,25 @@
 {% block content %}
 
 <div>
-    {% if result %}
-    <p>{{result['name']}} 
-        <a class="btn btn-primary" href="/users/add_to_list">Add to list</a> 
-        | 
-        <a class="btn btn-primary" href="/users/new_list">Make a list</a></p>
-    <p>{{result['address']}}</p>
-    <p>(estimate wait time will be here)</p>
-    {% endif %}
+    <h3>Search for a place</h3>
+
+    {% include 'form.html'%}
 </div>
 <div>
-    <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
-     <- 6ft ->
-    <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
-    <i class="fas fa-door-open"></i>
+    {% if place %}
+    <h5>{{place['name']}} 
+        <a class="btn btn-primary" href="/users/{{ user.email }}/add_to_list">Add to list</a> 
+        | 
+        <a class="btn btn-primary" href="/users/{{ user.email }}/add_list">Make a list</a></h5>
+    <p>{{place['address']}}</p>
+    <p>(estimate wait time will be here)</p>
+    <div>
+        <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
+         <- 6ft ->
+        <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
+        <i class="fas fa-door-open"></i>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}

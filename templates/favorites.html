@@ -4,20 +4,20 @@
 <h3>My Lists</h3>
 <p> This is where a users favorite lists will go</p>
 
-<!-- doesn't go to page yet-->
-<form>
-    {{form.hidden_tag()}}
-    <button class="bt btn-info" formmethod="POST" formaction="/users/{{ user.email }}/search">
-        Go to Search Form             
-    </button>
-</form>
-
 <ul>
     {% for favorite in favorites %}
     <li>
-        <p>{{ favorite.name }}</p>
+        <a href="/users/{{favorite.id}}">{{ favorite.name }}</a>
+        <p>{{ favorite.description }}</p>
     </li>
     {% endfor %}
 </ul>
+
+<form>
+    {{form.hidden_tag()}}
+    <button class="bt btn-info" formmethod="GET" formaction="/users/{{ user.email }}/search">
+        Go to Search Form             
+    </button>
+</form>
 
 {% endblock %}
