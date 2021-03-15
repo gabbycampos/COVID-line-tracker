@@ -5,6 +5,7 @@ from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm
 from werkzeug.exceptions import Unauthorized
 import requests
 from secrets import key 
+import populartimes
 
 API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext'
 
@@ -46,7 +47,6 @@ def get_place():
 
         db.session.add(place)
         #db.session.commit()
-        
         if not result['place_id']:
             db.session.commit()
 

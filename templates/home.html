@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h3>Welcome! Please search for a place or sign up to save a place</h3>
+<h3>Welcome! Please search for a place. Register to save a place.</h3>
 
 {% include 'form.html'%}
 
 <div>
     {% if place %}
     <h5>{{place['name']}}
+        {% if 'user_id' in session %}
         <a class="btn btn-primary" href="/users/{{ user.id }}/add_to_list">Add to list</a> 
         | 
         <a class="btn btn-primary" href="/users/{{ user.id }}/add_list">Make a list</a></h5>
+        {% endif %}
     <p>{{place['address']}}</p>
     <p>(estimate wait time will be here)</p>
 
