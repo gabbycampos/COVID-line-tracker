@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 <link rel="stylesheet" href="static/css/style.css">
 <title>Covid Line Tracker</title>
 </head>
@@ -16,7 +17,7 @@
         <div class="container">
           <a href="/" class="navbar-brand text-light">Covid Line Tracker</a>
           <ul class="nav navbar-nav flex-row float-right">
-            {% if 'email' in session %}
+            {% if 'user_id' in session %}
             <li class="nav-item">
               <a class="nav-link pr-3 text-light" href="/logout">Logout</a>
             </li>

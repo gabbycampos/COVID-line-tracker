@@ -1,0 +1,14 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+<h3>This is the list details page</h3>
+
+<form>
+    {{form.hidden_tag()}}
+    <button class="bt btn-info" formmethod="GET" formaction="/lists/{{ user.id }}/search">
+        Go to Search Form             
+    </button>
+</form>
+
+{% endblock %}

@@ -7,15 +7,22 @@
 <ul>
     {% for favorite in favorites %}
     <li>
-        <a href="/users/{{favorite.id}}">{{ favorite.name }}</a>
+        <form>
+            {{form.hidden_tag()}}
+            <button class="btn btn-primary" formmethod="GET" formaction="/users/{{ user.id }}/lists/{{ favorite.id }}">{{ favorite.name }}</button>
+        </form>
         <p>{{ favorite.description }}</p>
+        <form action="/users/{{ user.id }}/delete/{{ favorite.id }}", method="POST", class="d-inline">
+            <a href="/users/{{ user.id }}/edit/{{ favorite.id }}"><i class="fas fa-edit"></i></a>
+            <button class="btn bg-transparent"><i class="fas fa-trash"></i></button>                    
+        </form>
     </li>
     {% endfor %}
 </ul>
 
 <form>
     {{form.hidden_tag()}}
-    <button class="bt btn-info" formmethod="GET" formaction="/users/{{ user.email }}/search">
+    <button class="btn btn-info" formmethod="GET" formaction="/users/{{ user.id }}/search">
         Go to Search Form             
     </button>
 </form>

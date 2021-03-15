@@ -13,8 +13,8 @@ class User(db.Model):
     """ user model """
     __tablename__ = "users"
 
-    #id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.String(50), nullable=False, unique=True, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
     first_name = db.Column(db.String(30), nullable=False)
     last_name = db.Column(db.String(30), nullable=False)
@@ -49,8 +49,7 @@ class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.String(20), db.ForeignKey("users.email"))
-    place_id = db.Column(db.Integer, db.ForeignKey("places.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
 class Place(db.Model):
     """ For search results of a business """
@@ -58,5 +57,13 @@ class Place(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100))
-    google_id = db.Column(db.String(100))
+    place_id = db.Column(db.String(100), unique=True)
     address = db.Column(db.String(150))
+
+class FavoritePlace(db.Model):
+    """ Relationship Table """
+    __tablename__ = "favorite_places"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    google_id = db.Column(db.Integer, db.ForeignKey("places.id"), nullable=False)
+    favorite_id = db.Column(db.Integer, db.ForeignKey("favorites.id"), nullable=False)

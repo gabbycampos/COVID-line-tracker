@@ -10,9 +10,12 @@
 <div>
     {% if place %}
     <h5>{{place['name']}} 
-        <a class="btn btn-primary" href="/users/{{ user.email }}/add_to_list">Add to list</a> 
-        | 
-        <a class="btn btn-primary" href="/users/{{ user.email }}/add_list">Make a list</a></h5>
+        <form>
+            {{form.hidden_tag()}}
+            <a class="btn btn-primary" formmethod="GET" formaction="/users/{{ user.id }}/add_to_list">Add to list</a>
+            <a class="btn btn-primary" formmethod="GET" formatction="/users/{{ user.id }}/add_list">Make a new list</a>
+        </form>
+    </h5>
     <p>{{place['address']}}</p>
     <p>(estimate wait time will be here)</p>
     <div>

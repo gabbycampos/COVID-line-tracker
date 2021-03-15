@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, session, flash, request, jsonify
-from models import db, connect_db, User, Favorite, Place
+from models import db, connect_db, User, Favorite, Place, FavoritePlace
 from sqlalchemy.exc import IntegrityError
 from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm
 from werkzeug.exceptions import Unauthorized
@@ -28,7 +28,7 @@ def home_page():
 def get_place():
     """ Shows search form and process it """
     form = PlaceForm()
-     
+
     if form.validate_on_submit():
         query = form.name.data
         location = form.location.data
@@ -42,10 +42,13 @@ def get_place():
         }
         #print(result['name'])
 
-        place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
+        place = Place(name=result['name'], address=result['address'], place_id=result['place_id'])
 
         db.session.add(place)
-        db.session.commit()
+        #db.session.commit()
+        
+        if not result['place_id']:
+            db.session.commit()
 
         return render_template('/home.html', form=form, place=place, button="Search")
     else:
@@ -57,9 +60,6 @@ def get_place():
 def register():
     """ Register a user. Form and handle register"""
 
-    if "email" in session:
-        return redirect(f"/users/{session['email']}")
-
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -70,19 +70,20 @@ def register():
 
         user = User.register(email, password, first_name, last_name)
 
-        db.session.commit()
-        session['email'] = user.email 
-
-        return redirect(f"/users/{user.email}")
-    else:
-        return render_template("/register.html", form=form, button="Register")
+        db.session.add(user)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            form.email.errors.append('Email taken. Please try again.')
+            return render_template('register.html', form=form, button='Register')
+        session['user_id'] = user.id
+        flash('Welcome! Successfully Created Your Account!')
+        return redirect(f'/users/{user.id}')
+    return render_template('register.html', form=form, button='Register')
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """ Login form or handle login """
-
-    if "email" in session:
-        return redirect(f"/users/{session['email']}")
     
     form = LoginForm()
 
@@ -91,44 +92,44 @@ def login():
         password = form.password.data 
 
         user = User.authenticate(email, password)
+
         if user:
-            session['email'] = user.email 
-            return redirect(f"/users/{user.email}")
+            flash(f"Welcome Back, {user.email}!", "info")
+            session['user_id'] = user.id
+            return redirect(f"/users/{user.id}")
         else:
             form.email.errors = ["Invalid email/password"]
-            return render_template("users/login.html", form=form, button='Login')
 
-    return render_template("/login.html", form=form, button="Login")
-
+    return render_template("login.html", form=form, button='Login')
+    
 @app.route('/logout')
 def logout():
-    """ Logout route """ 
+    """ Logout route """
 
-    session.pop("email")
+    session.pop('user_id')
+    flash('Goodbye!')
     return redirect("/")
 
 
 ##################### User's FAVORITE LISTS PAGE and SEARCH FORM ####################################
-@app.route('/users/<email>', methods=["GET", "POST"])
-def show_favorites(email):
+@app.route('/users/<int:user_id>', methods=["GET", "POST"])
+def show_favorites(user_id):
     """ Shows a users lists of favorites & button to search form"""
-    favorites = Favorite.query.all()
 
-    if 'email' not in session or email != session['email']:
-        raise Unauthorized()
-    
-    user = User.query.get(email)
+    if 'user_id' not in session:
+        flash('Please login first')
+        return redirect('/login')
+
+    user = User.query.get_or_404(user_id)
+    favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
     form = DeleteForm()
+    return render_template('favorites.html', user=user, favorites=favorites, form=form, button='Go To Search Form')
 
-    return render_template("/favorites.html", user=user, favorites=favorites, form=form, button='Go To Search Form')
-
-@app.route('/users/<email>/search', methods=["GET", "POST"])
-def get_search_form(email):
+@app.route('/users/<int:user_id>/search', methods=["GET", "POST"])
+def get_search_form(user_id):
     """ Shows search form and process it """
-    if 'email' not in session or email != session['email']:
-        raise Unauthorized()
 
-    user = User.query.get(email)
+    user = User.query.get(user_id)
     form = PlaceForm()
      
     if form.validate_on_submit():
@@ -144,43 +145,82 @@ def get_search_form(email):
         }
         #print(result['name'])
 
-        place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
+        place = Place(name=result['name'], address=result['address'], place_id=result['place_id'])
 
         db.session.add(place)
-        db.session.commit()
+        #db.session.commit()
+        if not result['place_id']:
+            db.session.commit()
 
-        return render_template('/results.html', form=form, place=place, user=user, button="Search")
+        return render_template('/home.html', form=form, place=place, user=user, button="Search")
     else:
         return render_template("/search_form.html", user=user, form=form, button="Search")
 
 
-######################## NEW LIST & LIST DETAILS & ADD TO LIST #####################################################
-@app.route('/users/<email>/add_list', methods=['GET', 'POST'])
-def add_list(email):
-    """ Makes a new list. If valid redirect to a user's list of lists """
-    favorites = Favorite.query.all()
+# ######################## NEW LIST & LIST DETAILS & ADD TO LIST ###############################################
+@app.route('/users/<int:user_id>/add_list', methods=['GET', 'POST'])
+def add_list(user_id):
+    """ Makes a new list. Add current place to list. If valid redirect to a user's list of lists """
+    if 'user_id' not in session:
+        flash('Please login first')
+        return redirect('/login')
 
-    if 'email' not in session or email != session['email']:
-        raise Unauthorized()
+    user = User.query.get_or_404(user_id)
+    favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
 
-    user = User.query.get(email)
     form = FavoriteForm()
 
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data 
 
-        new_list = Favorite(name=name, description=description)
+        new_list = Favorite(name=name, description=description, user_id=user_id)
 
         db.session.add(new_list)
         db.session.commit()
-        return redirect(f"/users/{email}", favorite=favorites)
+        return redirect(f"/users/{user_id}")
     return render_template('new_list.html', form=form, user=user, button="Add")
 
-@app.route('/users/<int:')
-def list_details():
+@app.route('/users/<int:user_id>/lists/<int:favorite_id>', methods=['GET', 'POST'])
+def list_details(favorite_id, user_id):
     """ Shows a users list details"""
+    form = FavoriteForm()
+    user = User.query.get_or_404(user_id)
+    favorite = Favorite.query.get_or_404(favorite_id)
+    return render_template('list_details.html', favorite=favorite, form=form, user=user)
 
-@app.route('/users/add_to_list', methods=['GET', 'POST'])
-def add_place():
-    """ Add a place to an existing list """
+# @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
+# def add_place():
+#     """ Add a place to an existing list """
+
+
+
+
+########################### DELETE & EDIT ROUTES #################################################
+@app.route('/users/<int:user_id>/delete/<int:favorite_id>', methods=["GET", "POST"])
+def delete_favorites(user_id, favorite_id):
+    """ Deletes a favorite list"""
+    if session.get('user_id'):
+        favorite = Favorite.query.get_or_404(favorite_id)
+        db.session.delete(favorite)
+        db.session.commit()
+        flash("List deleted", "info")
+        return redirect(f"/users/{user_id}")
+    else:
+        flash("Please login first", "danger")
+        return redirect('/login')
+
+@app.route('/users/<int:user_id>/edit/<int:favorite_id>', methods=["GET", "POST"])
+def edit_favorite(user_id, favorite_id):
+    if 'user_id' not in session:
+        flash("Please login first", "danger")
+        return redirect('/login')
+    favorite = Favorite.query.get_or_404(favorite_id)
+    form = FavoriteForm(obj=favorite)
+    if form.validate_on_submit():
+        favorite.name = form.name.data 
+        favorite.content = form.description.data
+        db.session.commit()
+        flash("List updated successfully", "info")
+        return redirect(f'/users/{user_id}')
+    return render_template('edit_list.html', button='Edit', form=form, favorite=favorite)
