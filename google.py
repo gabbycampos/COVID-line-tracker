@@ -13,4 +13,5 @@ from populartimes import get_id
 
 #spinninJ place_id: 'ChIJx3IBfKrSD4gRxX9ucld95J8'
 response = get_id(f'{key}', 'ChIJSYuuSx9awokRyrrOFTGg0GY' )
-print(response['populartimes'])
+print(response)
+#print(response['populartimes'])

@@ -189,10 +189,21 @@ def list_details(favorite_id, user_id):
     favorite = Favorite.query.get_or_404(favorite_id)
     return render_template('list_details.html', favorite=favorite, form=form, user=user)
 
-# @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
-# def add_place():
-#     """ Add a place to an existing list """
+@app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
+def list_choices(user_id):
+    """ Shows list choices  """
+    if 'user_id' not in session:
+        flash('Please login first')
+        return redirect('/login')
 
+    user = User.query.get_or_404(user_id)
+    favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
+
+    return render_template('/list_choices.html', user=user, favorites=favorites)
+
+# @app.route('/users/<int:user_id>/add_to_list/<int:favorite_id>', methods=['GET', 'POST'])
+# def add_place(favorite_id, user_id):
+#     """ Add a place to an existing list """
 
 
 
@@ -212,6 +223,7 @@ def delete_favorites(user_id, favorite_id):
 
 @app.route('/users/<int:user_id>/edit/<int:favorite_id>', methods=["GET", "POST"])
 def edit_favorite(user_id, favorite_id):
+    """ Edits a list """
     if 'user_id' not in session:
         flash("Please login first", "danger")
         return redirect('/login')
@@ -224,3 +236,17 @@ def edit_favorite(user_id, favorite_id):
         flash("List updated successfully", "info")
         return redirect(f'/users/{user_id}')
     return render_template('edit_list.html', button='Edit', form=form, favorite=favorite)
+
+@app.route('/users/<int:user_id>/delete', methods=["POST"])
+def delete_user(user_id):
+    """ Deletes a user """
+    if 'user_id' not in session:
+        flash("Please login first", "danger")
+        return redirect('/login')
+    form = LoginForm()
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    session.pop('user_id')
+    flash('Account was deleted', 'warning')
+    return redirect('/login')

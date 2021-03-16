@@ -2,6 +2,9 @@
 
 {% block content %}
 <h3>My Lists</h3>
+<form action="/users/{{ user.id }}/delete" method="POST">
+    <button type="submit" class="btn btn-danger">Delete Account</button>
+</form>
 <p> This is where a users favorite lists will go</p>
 
 <ul>
@@ -9,11 +12,11 @@
     <li>
         <form>
             {{form.hidden_tag()}}
-            <button class="btn btn-primary" formmethod="GET" formaction="/users/{{ user.id }}/lists/{{ favorite.id }}">{{ favorite.name }}</button>
+            <button class="btn btn-link" formmethod="GET" formaction="/users/{{ user.id }}/lists/{{ favorite.id }}">{{ favorite.name }}</button>
         </form>
-        <p>{{ favorite.description }}</p>
-        <form action="/users/{{ user.id }}/delete/{{ favorite.id }}", method="POST", class="d-inline">
-            <a href="/users/{{ user.id }}/edit/{{ favorite.id }}"><i class="fas fa-edit"></i></a>
+        <p>- {{ favorite.description }}</p>
+        <form action="/users/{{ user.id }}/delete/{{ favorite.id }}", method="POST">
+            <button class="btn btn-light" href="/users/{{ user.id }}/edit/{{ favorite.id }}">Edit</button>
             <button class="btn bg-transparent"><i class="fas fa-trash"></i></button>                    
         </form>
     </li>
