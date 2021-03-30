@@ -16,8 +16,8 @@
         </form>
         <p>- {{ favorite.description }}</p>
         <form action="/users/{{ user.id }}/delete/{{ favorite.id }}", method="POST">
-            <button class="btn btn-light" href="/users/{{ user.id }}/edit/{{ favorite.id }}">Edit</button>
             <button class="btn bg-transparent"><i class="fas fa-trash"></i></button>                    
+            <a class="btn btn-light" href="/users/{{ user.id }}/edit/{{ favorite.id }}">Edit</a>
         </form>
     </li>
     {% endfor %}

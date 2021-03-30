@@ -5,7 +5,8 @@ from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm
 from werkzeug.exceptions import Unauthorized
 import requests
 from secrets import key 
-import populartimes
+from populartimes import get_id
+import datetime
 
 API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext'
 
@@ -19,47 +20,18 @@ app.config["SECRET_KEY"] = "covidsecretapp"
 connect_db(app)
 db.create_all()
 
-#################### HOME PAGE AND HOMEPAGE-SEARCH FORM ############################
+#################### HOME PAGE  ############################
 @app.route('/')
 def home_page():
-    form = PlaceForm()
-    return render_template('home.html', form=form, button="Search")
+    return render_template('home.html')
 
-@app.route('/', methods=["GET", "POST"])
-def get_place():
-    """ Shows search form and process it """
-    form = PlaceForm()
 
-    if form.validate_on_submit():
-        query = form.name.data
-        location = form.location.data
-        response = requests.get(f'{API_BASE_URL}/json?input={query}&inputtype=textquery&fields=place_id,name,formatted_address&key={key}')
-        data = response.json()
-
-        result = {
-            'name': data['candidates'][0]['name'],
-            'address': data['candidates'][0]['formatted_address'],
-            'place_id': data['candidates'][0]['place_id']
-        }
-        #print(result['name'])
-
-        place = Place(name=result['name'], address=result['address'], place_id=result['place_id'])
-
-        db.session.add(place)
-        #db.session.commit()
-        if not result['place_id']:
-            db.session.commit()
-
-        return render_template('/home.html', form=form, place=place, button="Search")
-    else:
-        return redirect("/", form=form, button="Search")
 
 
 ##################### REGISTER AND LOGIN routes ####################################
 @app.route('/register', methods=["GET", "POST"])
 def register():
     """ Register a user. Form and handle register"""
-
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -68,23 +40,22 @@ def register():
         first_name = form.first_name.data 
         last_name = form.last_name.data 
 
-        user = User.register(email, password, first_name, last_name)
+        new_user = User.register(email, password, first_name, last_name)
 
-        db.session.add(user)
+        db.session.add(new_user)
         try:
             db.session.commit()
         except IntegrityError:
             form.email.errors.append('Email taken. Please try again.')
             return render_template('register.html', form=form, button='Register')
-        session['user_id'] = user.id
+        session['user_id'] = new_user.id
         flash('Welcome! Successfully Created Your Account!')
-        return redirect(f'/users/{user.id}')
+        return redirect(f'/users/{new_user.id}')
     return render_template('register.html', form=form, button='Register')
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """ Login form or handle login """
-    
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -105,7 +76,6 @@ def login():
 @app.route('/logout')
 def logout():
     """ Logout route """
-
     session.pop('user_id')
     flash('Goodbye!')
     return redirect("/")
@@ -145,14 +115,21 @@ def get_search_form(user_id):
         }
         #print(result['name'])
 
-        place = Place(name=result['name'], address=result['address'], place_id=result['place_id'])
+        place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
 
         db.session.add(place)
         #db.session.commit()
         if not result['place_id']:
             db.session.commit()
 
-        return render_template('/home.html', form=form, place=place, user=user, button="Search")
+        google = result['place_id']
+        time_resp = get_id(f"{key}", google)
+        today = datetime.datetime.today().weekday()
+        day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
+        #print(round(day / 2))
+        wait_time = round(day / 2)
+
+        return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
     else:
         return render_template("/search_form.html", user=user, form=form, button="Search")
 
@@ -201,9 +178,9 @@ def list_choices(user_id):
 
     return render_template('/list_choices.html', user=user, favorites=favorites)
 
-# @app.route('/users/<int:user_id>/add_to_list/<int:favorite_id>', methods=['GET', 'POST'])
-# def add_place(favorite_id, user_id):
-#     """ Add a place to an existing list """
+@app.route('/users/<int:user_id>/add_to_list/<int:favorite_id>', methods=['GET', 'POST'])
+def add_place(favorite_id, user_id):
+    """ Add a place to an existing list """
 
 
 

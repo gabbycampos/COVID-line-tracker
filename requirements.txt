@@ -7,6 +7,8 @@ dnspython==2.1.0
 email-validator==1.1.2
 Flask==1.1.2
 Flask-Bcrypt==0.7.1
+Flask-Login==0.5.0
+Flask-LoginManager==1.1.6
 Flask-SQLAlchemy==2.4.4
 Flask-WTF==0.14.3
 geographiclib==1.50

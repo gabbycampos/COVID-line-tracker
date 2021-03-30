@@ -7,19 +7,19 @@
 <div>
     {% if place %}
     <h5>{{place['name']}}
-        <form>
-            {{form.hidden_tag()}}
-            <a class="btn btn-primary" formmethod="GET" formaction="/users/{{ user.id }}/add_to_list">Add to list</a>
-            <a class="btn btn-primary" formmethod="GET" formatction="/users/{{ user.id }}/add_list">Make a new list</a>
-        </form>
-    </h5>
+        {% if 'user_id' in session %}
+        <a class="btn btn-primary" href="/users/{{ user.id }}/add_to_list">Add to list</a> 
+        | 
+        <a class="btn btn-primary" href="/users/{{ user.id }}/add_list">Make a list</a></h5>
+        {% endif %}
     <p>{{place['address']}}</p>
-    <p>(estimate wait time will be here)</p>
+    <p>Estimated wait time to order is {{ wait_time }} minutes.</p>
 
-    <div>
-        <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
-         <- 6ft ->
-        <i class="fas fa-walking"></i> <- 6ft -> <i class="fas fa-walking"></i>
+    <div class="col-12">
+        <i class="fas fa-walking pr-5"></i> <- 6ft -> 
+        <i class="fas fa-walking px-5"></i> <- 6ft ->
+        <i class="fas fa-walking px-5"></i> <- 6ft -> 
+        <i class="fas fa-walking px-5"></i>
         <i class="fas fa-door-open"></i>
     </div>
     {% endif %}

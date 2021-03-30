@@ -57,7 +57,7 @@ class Place(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100))
-    place_id = db.Column(db.String(100), unique=True)
+    google_id = db.Column(db.String(100), unique=True)
     address = db.Column(db.String(150))
 
 class FavoritePlace(db.Model):
@@ -65,5 +65,5 @@ class FavoritePlace(db.Model):
     __tablename__ = "favorite_places"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    google_id = db.Column(db.Integer, db.ForeignKey("places.id"), nullable=False)
+    place_id = db.Column(db.Integer, db.ForeignKey("places.id"), nullable=False)
     favorite_id = db.Column(db.Integer, db.ForeignKey("favorites.id"), nullable=False)
