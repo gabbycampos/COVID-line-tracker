@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session, flash, request, jsonify
 from models import db, connect_db, User, Favorite, Place, FavoritePlace
 from sqlalchemy.exc import IntegrityError
-from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm
+from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm, AddToList
 from werkzeug.exceptions import Unauthorized
 import requests
 from secrets import key 
@@ -127,7 +127,6 @@ def get_search_form(user_id):
             time_resp = get_id(f"{key}", google)
             today = datetime.datetime.today().weekday()
             day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
-            #print(round(day / 2))
             wait_time = round(day / 2)
 
             return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
@@ -136,7 +135,6 @@ def get_search_form(user_id):
         time_resp = get_id(f"{key}", google)
         today = datetime.datetime.today().weekday()
         day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
-        #print(round(day / 2))
         wait_time = round(day / 2)
 
         return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
@@ -179,11 +177,15 @@ def list_details(favorite_id, user_id):
 @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
 def list_choices(user_id):
     """ Shows list choices and add to list. """
+    form = AddToList()
     user = User.query.get_or_404(user_id)
     #place = Place.query.get_or_404(place_id)
     favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
 
-    return render_template('/list_choices.html', user=user, favorites=favorites)
+    if form.validate_on_submit():
+        print(request.form.get('add_place'))
+
+    return render_template('list_choices.html', user=user, favorites=favorites, form=form)
 
 ########################### DELETE & EDIT ROUTES #################################################
 @app.route('/users/<int:user_id>/delete/<int:favorite_id>', methods=["GET", "POST"])

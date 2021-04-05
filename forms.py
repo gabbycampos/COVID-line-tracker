@@ -1,4 +1,4 @@
-from wtforms import TextAreaField, StringField, PasswordField, SelectField
+from wtforms import TextAreaField, StringField, PasswordField, SelectField, SubmitField
 from wtforms.validators import InputRequired, Length, NumberRange, Email, Optional
 from flask_wtf import FlaskForm
 
@@ -25,3 +25,6 @@ class DeleteForm(FlaskForm):
 class PlaceForm(FlaskForm):
     name = StringField("Name", validators=[InputRequired("Enter Place Name")])
     location = StringField("City (optional)", validators=[Optional("Enter City")])
+
+class AddToList(FlaskForm):
+    submit = SubmitField(label="add")
