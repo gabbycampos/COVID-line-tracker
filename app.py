@@ -118,10 +118,20 @@ def get_search_form(user_id):
         place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
 
         db.session.add(place)
-        #db.session.commit()
-        if not result['place_id']:
+        try:
             db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
 
+            google = result['place_id']
+            time_resp = get_id(f"{key}", google)
+            today = datetime.datetime.today().weekday()
+            day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
+            #print(round(day / 2))
+            wait_time = round(day / 2)
+
+            return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
+     
         google = result['place_id']
         time_resp = get_id(f"{key}", google)
         today = datetime.datetime.today().weekday()
@@ -137,7 +147,7 @@ def get_search_form(user_id):
 # ######################## NEW LIST & LIST DETAILS & ADD TO LIST ###############################################
 @app.route('/users/<int:user_id>/add_list', methods=['GET', 'POST'])
 def add_list(user_id):
-    """ Makes a new list. Add current place to list. If valid redirect to a user's list of lists """
+    """ Makes a new list. If valid redirect to a user's list of lists """
     if 'user_id' not in session:
         flash('Please login first')
         return redirect('/login')
@@ -168,21 +178,12 @@ def list_details(favorite_id, user_id):
 
 @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
 def list_choices(user_id):
-    """ Shows list choices  """
-    if 'user_id' not in session:
-        flash('Please login first')
-        return redirect('/login')
-
+    """ Shows list choices and add to list. """
     user = User.query.get_or_404(user_id)
+    #place = Place.query.get_or_404(place_id)
     favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
 
     return render_template('/list_choices.html', user=user, favorites=favorites)
-
-@app.route('/users/<int:user_id>/add_to_list/<int:favorite_id>', methods=['GET', 'POST'])
-def add_place(favorite_id, user_id):
-    """ Add a place to an existing list """
-
-
 
 ########################### DELETE & EDIT ROUTES #################################################
 @app.route('/users/<int:user_id>/delete/<int:favorite_id>', methods=["GET", "POST"])
