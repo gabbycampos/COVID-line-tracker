@@ -24,7 +24,6 @@ class DeleteForm(FlaskForm):
 
 class PlaceForm(FlaskForm):
     name = StringField("Name", validators=[InputRequired("Enter Place Name")])
-    location = StringField("City (optional)", validators=[Optional("Enter City")])
 
 class AddToList(FlaskForm):
     submit = SubmitField(label="add")

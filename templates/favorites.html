@@ -1,33 +1,47 @@
 {% extends 'base.html'%}
 
 {% block content %}
-<h3>My Lists</h3>
-<form action="/users/{{ user.id }}/delete" method="POST">
-    <button type="submit" class="btn btn-danger">Delete Account</button>
-</form>
-<p> This is where a users favorite lists will go</p>
-
-<ul>
-    {% for favorite in favorites %}
-    <li>
-        <form>
-            {{form.hidden_tag()}}
-            <button class="btn btn-link" formmethod="GET" formaction="/users/{{ user.id }}/lists/{{ favorite.id }}">{{ favorite.name }}</button>
-        </form>
-        <p>- {{ favorite.description }}</p>
-        <form action="/users/{{ user.id }}/delete/{{ favorite.id }}", method="POST">
-            <button class="btn bg-transparent"><i class="fas fa-trash"></i></button>                    
-            <a class="btn btn-light" href="/users/{{ user.id }}/edit/{{ favorite.id }}">Edit</a>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
-
-<form>
-    {{form.hidden_tag()}}
-    <button class="btn btn-info" formmethod="GET" formaction="/users/{{ user.id }}/search">
-        Go to Search Form             
-    </button>
-</form>
+<div class="container p-5">
+    <div class="row">
+        <div class="col">
+            <h3 class="font-weight-light">{{ user.first_name }}'s lists</h3>
+        </div>
+        <div class="col text-right">
+            <form action="/users/{{ user.id }}/delete" method="POST">
+                <button type="submit" class="btn btn-transparent border">Delete Account</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul class="list-group pt-5">
+                {% for favorite in favorites %}
+                <li class="list-group-item">
+                    <form class="p-2">
+                        {{form.hidden_tag()}}
+                        <button class="btn btn-info" formmethod="GET" formaction="/users/{{ user.id }}/lists/{{ favorite.id }}">{{ favorite.name }}</button>
+                    </form>
+                    <p class="ml-5"> - {{ favorite.description }}</p>
+                    <form action="/users/{{ user.id }}/delete/{{ favorite.id }}", method="POST">
+                        <button class="btn btn-transparent border ml-5"><i class="fas fa-trash"></i></button>                    
+                        <a class="btn btn-transparent border" href="/users/{{ user.id }}/edit/{{ favorite.id }}">Edit</a>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col text-right pt-5">
+            <form>
+                {{form.hidden_tag()}}
+                <button class="btn btn-info" formmethod="GET" formaction="/users/{{ user.id }}/search">
+                    Go to Search Form             
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

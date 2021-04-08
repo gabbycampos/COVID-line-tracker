@@ -4,25 +4,41 @@
 
 {% include 'form.html'%}
 
-<div>
-    {% if place %}
-    <h5>{{place['name']}}
-        {% if 'user_id' in session %}
-        <a class="btn btn-primary" href="/users/{{ user.id }}/add_to_list">Add to list</a> 
-        | 
-        <a class="btn btn-primary" href="/users/{{ user.id }}/add_list">Make a list</a></h5>
-        {% endif %}
-    <p>{{place['address']}}</p>
-    <p>Estimated wait time to get order is {{ wait_time }} minutes.</p>
+<div class="container p-5">
+    <div class="row">
+        <div class="col">
+            {% if place %}
+            <h5>{{place['name']}}</h5>
+            <p>{{place['address']}}</p>
 
-    <div class="col-12">
-        <i class="fas fa-walking pr-5"></i> <- 6ft -> 
-        <i class="fas fa-walking px-5"></i> <- 6ft ->
-        <i class="fas fa-walking px-5"></i> <- 6ft -> 
-        <i class="fas fa-walking px-5"></i>
-        <i class="fas fa-door-open"></i>
+            {% if wait_time %}
+            <p>Estimated wait time to get order is <span class="font-weight-bold">{{ wait_time }} minutes.</span></p>
+            {% else %}
+            <p>No available wait time for this place.</p>
+            {% endif %}
+
+            {% else %}
+            <p>Place not found in Google Maps.</p>
+            {% endif %}
+        </div>
+        <div class="col">
+            <a class="btn btn-transparent border" href="/users/{{ user.id }}/add_to_list">Add to list</a> 
+            | 
+            <a class="btn btn-transparent border" href="/users/{{ user.id }}/add_list">Make a list</a></h5>
+        </div>
     </div>
-    {% endif %}
+    <div class="row mt-5">
+        <div class="col text-center">
+            <div class="col-12 bg-info p-3 rounded d-flex justify-content-around">
+                <i class="fas fa-walking pr-5" style="color:white"></i> <i class="far fa-hand-paper" style="color:white"></i>
+                <i class="fas fa-walking px-5" style="color:white"></i> <i class="far fa-hand-paper" style="color:white"></i>
+                <i class="fas fa-walking px-5" style="color:white"></i> <i class="far fa-hand-paper" style="color:white"></i>
+                <i class="fas fa-walking px-5" style="color:white"></i>
+                <i class="fas fa-door-open"></i>
+            </div>
+        </div>
+    </div>
 </div>
+<div>
 
 {% endblock %}

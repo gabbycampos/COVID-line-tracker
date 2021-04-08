@@ -23,8 +23,7 @@ db.create_all()
 #################### HOME PAGE  ############################
 @app.route('/')
 def home_page():
-    return render_template('home.html')
-
+    return redirect("/register")
 
 
 
@@ -32,6 +31,8 @@ def home_page():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     """ Register a user. Form and handle register"""
+    if "user_id" in session:
+        return redirect(f"/users/{session['user_id']}")
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -104,7 +105,6 @@ def get_search_form(user_id):
      
     if form.validate_on_submit():
         query = form.name.data
-        location = form.location.data
         response = requests.get(f'{API_BASE_URL}/json?input={query}&inputtype=textquery&fields=place_id,name,formatted_address&key={key}')
         data = response.json()
 
@@ -130,14 +130,8 @@ def get_search_form(user_id):
             wait_time = round(day / 2)
 
             return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
-     
-        google = result['place_id']
-        time_resp = get_id(f"{key}", google)
-        today = datetime.datetime.today().weekday()
-        day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
-        wait_time = round(day / 2)
 
-        return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
+        return render_template('/results.html', form=form, place=place, user=user, button="Search")
     else:
         return render_template("/search_form.html", user=user, form=form, button="Search")
 
@@ -179,13 +173,16 @@ def list_choices(user_id):
     """ Shows list choices and add to list. """
     form = AddToList()
     user = User.query.get_or_404(user_id)
-    #place = Place.query.get_or_404(place_id)
+    #place = db.session.query(Place.name).all()
+    place = Place.query.filter_by(**request.args.to_dict()).all()
+    #place = Place.query.filter(request.form.get('name'))
     favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
 
     if form.validate_on_submit():
-        print(request.form.get('add_place'))
+        print(place)
+        render_template('favorites.html', user=user, favorites=favorites, place=place, form=form)
 
-    return render_template('list_choices.html', user=user, favorites=favorites, form=form)
+    return render_template('list_choices.html', user=user, favorites=favorites, place=place, form=form)
 
 ########################### DELETE & EDIT ROUTES #################################################
 @app.route('/users/<int:user_id>/delete/<int:favorite_id>', methods=["GET", "POST"])
