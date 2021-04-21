@@ -166,23 +166,28 @@ def list_details(favorite_id, user_id):
     form = FavoriteForm()
     user = User.query.get_or_404(user_id)
     favorite = Favorite.query.get_or_404(favorite_id)
-    return render_template('list_details.html', favorite=favorite, form=form, user=user)
+    favList = Favorite.query.get_or_404(favorite_id)
+    return render_template('list_details.html', favorite=favorite, form=form, favList=favList, user=user)
 
 @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
 def list_choices(user_id):
     """ Shows list choices and add to list. """
     form = AddToList()
+
     user = User.query.get_or_404(user_id)
-    #place = db.session.query(Place.name).all()
-    place = Place.query.filter_by(**request.args.to_dict()).all()
-    #place = Place.query.filter(request.form.get('name'))
-    favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
+    #favorites = db.session.query(Favorite).filter_by(user_id=user_id).all()
+    form.fav.choices = [(fav.id, fav.name) for fav in Favorite.query.filter_by(user_id=user_id).all()]
 
     if form.validate_on_submit():
-        print(place)
-        render_template('favorites.html', user=user, favorites=favorites, place=place, form=form)
+        #place = request.args['place_id']
+        place = Place.query.get(request.args['place_id'])
+        #favList = Favorite.query.filter_by(id=form.fav.data).first()
+        favList = Favorite.query.get(form.fav.data)
+        favList.places.append(place)
+        db.session.commit()
+        return redirect(f"/users/{user_id}")
 
-    return render_template('list_choices.html', user=user, favorites=favorites, place=place, form=form)
+    return render_template('list_choices.html', user=user, form=form, button="Add")
 
 ########################### DELETE & EDIT ROUTES #################################################
 @app.route('/users/<int:user_id>/delete/<int:favorite_id>', methods=["GET", "POST"])

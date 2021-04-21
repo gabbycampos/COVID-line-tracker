@@ -26,4 +26,4 @@ class PlaceForm(FlaskForm):
     name = StringField("Name", validators=[InputRequired("Enter Place Name")])
 
 class AddToList(FlaskForm):
-    submit = SubmitField(label="add")
+    fav = SelectField("list")

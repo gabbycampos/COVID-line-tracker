@@ -20,9 +20,10 @@
             {% else %}
             <p>Place not found in Google Maps.</p>
             {% endif %}
+   
         </div>
         <div class="col">
-            <a class="btn btn-transparent border" href="/users/{{ user.id }}/add_to_list">Add to list</a> 
+            <a class="btn btn-transparent border" href="/users/{{ user.id }}/add_to_list?place_id={{ place.id }}">Add to list</a> 
             | 
             <a class="btn btn-transparent border" href="/users/{{ user.id }}/add_list">Make a list</a></h5>
         </div>

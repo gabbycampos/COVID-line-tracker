@@ -51,19 +51,21 @@ class Favorite(db.Model):
     description = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
+    places = db.relationship("Place", secondary="favorite_places", backref=db.backref("favorites"))
+
 class Place(db.Model):
     """ For search results of a business """
     __tablename__ = "places"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100))
-    google_id = db.Column(db.String(100), unique=True)
+    google_id = db.Column(db.String(100))
     address = db.Column(db.String(150))
 
 class FavoritePlace(db.Model):
     """ Relationship Table """
     __tablename__ = "favorite_places"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     place_id = db.Column(db.Integer, db.ForeignKey("places.id"), nullable=False)
     favorite_id = db.Column(db.Integer, db.ForeignKey("favorites.id"), nullable=False)

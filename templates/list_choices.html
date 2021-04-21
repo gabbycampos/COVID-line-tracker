@@ -2,27 +2,6 @@
 
 {% block content %}
 
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        <label for="list">Lists</label>
-        <select class="form-control" name="list">
-            <option value="New List" selected>Select a list</option>
-            {% for favorite in favorites %}
-                {% if favorite['name'] == request.form['name'] %}
-                    <option value="{{ request.form['name'] }}" selected>
-                        {{ request.form['name'] }}
-                    </option>
-                {% else %}
-                    <option value="{{ favorite['name'] }}">
-                        {{ favorite['name'] }}
-                    </option>
-                {% endif %}
-            {% endfor %}
-        </select>
-        <input id="add_place" name="add_place" type="hidden" value="{{place_id}}">
-        <button>Add to List</button>
-    </div>
-</form>
+    {% include 'form.html'%}
 
 {% endblock %}
