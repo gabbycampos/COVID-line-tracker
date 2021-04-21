@@ -167,6 +167,7 @@ def list_details(favorite_id, user_id):
     user = User.query.get_or_404(user_id)
     favorite = Favorite.query.get_or_404(favorite_id)
     favList = Favorite.query.get_or_404(favorite_id)
+    # place = Place.query.get_or_404(place_id)
     return render_template('list_details.html', favorite=favorite, form=form, favList=favList, user=user)
 
 @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
@@ -232,3 +233,23 @@ def delete_user(user_id):
     session.pop('user_id')
     flash('Account was deleted', 'warning')
     return redirect('/login')
+
+# @app.route('/users/<int:place_id>/delete', methods=['POST'])
+# def delete_place(place_id):
+#     """ Deletes a place from a list """
+#     place = Place.query.get(place_id)
+#     db.session.delete(place)
+#     db.session.commit()
+#     return redirect('/login')
+    
+# <div class="col text-right">
+#     <form action="/users/{{ place.id }}/delete" method="POST">
+#         <button type="submit" class="btn btn-transparent border">Delete Place</button>
+#         </form>
+# </div>
+      
+
+    
+   
+
+   
