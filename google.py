@@ -14,11 +14,13 @@ import datetime
 
 #spinninJ place_id: 'ChIJx3IBfKrSD4gRxX9ucld95J8'
 
-response = get_id(f'{key}', 'ChIJo8CY8yfND4gReSqFk87XuIw' )
-#print(response)
+response = get_id(f'{key}', 'ChIJ4VuSG-Bl24ARSOf2qkoteQ4' )
+print(response)
 today = datetime.datetime.today().weekday()
 day = response['populartimes'][today]['data'][datetime.datetime.now().hour]
 print(day)
+wait_time = round(day / 2)
+print(wait_time)
 #print(today)
 #print(today.strftime("%A"))
 

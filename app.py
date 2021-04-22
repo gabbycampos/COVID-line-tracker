@@ -120,16 +120,18 @@ def get_search_form(user_id):
         db.session.add(place)
         try:
             db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-
             google = result['place_id']
             time_resp = get_id(f"{key}", google)
             today = datetime.datetime.today().weekday()
             day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
             wait_time = round(day / 2)
-
+            print('hello**********************************************')
+            print('wait time', wait_time)
             return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
+
+        except IntegrityError:
+            db.session.rollback()
+
 
         return render_template('/results.html', form=form, place=place, user=user, button="Search")
     else:
