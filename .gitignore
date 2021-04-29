@@ -1,2 +1,2 @@
 venv/
-.secrets.py
+secret_file.py

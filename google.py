@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import requests
-from secrets import key 
+# from secrets import key 
 from populartimes import get_id
 import datetime
 
@@ -14,13 +14,14 @@ import datetime
 
 #spinninJ place_id: 'ChIJx3IBfKrSD4gRxX9ucld95J8'
 
-response = get_id(f'{key}', 'ChIJ4VuSG-Bl24ARSOf2qkoteQ4' )
-print(response)
-today = datetime.datetime.today().weekday()
-day = response['populartimes'][today]['data'][datetime.datetime.now().hour]
-print(day)
-wait_time = round(day / 2)
-print(wait_time)
+# response = get_id(f'{key}', 'ChIJ4VuSG-Bl24ARSOf2qkoteQ4' )
+# print(response)
+# today = datetime.datetime.today().weekday()
+# day = response['populartimes'][today]['data'][datetime.datetime.now().hour]
+# print(day)
+# wait_time = round(day / 2)
+# print(wait_time)
+
 #print(today)
 #print(today.strftime("%A"))
 
