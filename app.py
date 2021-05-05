@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm, AddToList
 from werkzeug.exceptions import Unauthorized
 import requests
-from secrets import key 
+from keys import key 
 from populartimes import get_id
 import datetime
 
