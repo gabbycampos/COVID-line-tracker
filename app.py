@@ -7,12 +7,13 @@ import requests
 from keys import key 
 from populartimes import get_id
 import datetime
+import os
 
 API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext'
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres:///covid_lt"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABSE_URL', 'postgres:///covid_lt')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
 app.config["SQLALCHEMY_ECHO"] = True 
 app.config["SECRET_KEY"] = "covidsecretapp"
