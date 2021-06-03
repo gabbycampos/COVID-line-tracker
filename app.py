@@ -8,10 +8,12 @@ from keys import key
 from populartimes import get_id
 import datetime
 import os
+from flask_cors import CORS
 
 API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext'
 
 app = Flask(__name__)
+CORS(app) # enable CORS for all routes
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', "postgres:///covid_lt")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
