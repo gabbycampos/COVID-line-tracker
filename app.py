@@ -13,7 +13,7 @@ from flask_cors import CORS
 API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext'
 
 app = Flask(__name__)
-CORS(app) # enable CORS for all routes
+CORS(app, resources=f'/users/*') # enable CORS 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', "postgres:///covid_lt")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
