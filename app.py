@@ -170,6 +170,7 @@ def add_list(user_id):
     return render_template('new_list.html', form=form, user=user, button="Add")
 
 @app.route('/users/<int:user_id>/lists/<int:favorite_id>', methods=['GET', 'POST'])
+@cross_origin()
 def list_details(favorite_id, user_id):
     """ Shows a users list details"""
     form = FavoriteForm()
@@ -180,6 +181,7 @@ def list_details(favorite_id, user_id):
     return render_template('list_details.html', favorite=favorite, form=form, favList=favList, user=user)
 
 @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
+@cross_origin()
 def list_choices(user_id):
     """ Shows list choices and add to list. """
     form = AddToList()
@@ -201,6 +203,7 @@ def list_choices(user_id):
 
 ########################### DELETE & EDIT ROUTES #################################################
 @app.route('/users/<int:user_id>/delete/<int:favorite_id>', methods=["GET", "POST"])
+@cross_origin()
 def delete_favorites(user_id, favorite_id):
     """ Deletes a favorite list"""
     if session.get('user_id'):
@@ -214,6 +217,7 @@ def delete_favorites(user_id, favorite_id):
         return redirect('/login')
 
 @app.route('/users/<int:user_id>/edit/<int:favorite_id>', methods=["GET", "POST"])
+@cross_origin()
 def edit_favorite(user_id, favorite_id):
     """ Edits a list """
     if 'user_id' not in session:
@@ -230,6 +234,7 @@ def edit_favorite(user_id, favorite_id):
     return render_template('edit_list.html', button='Edit', form=form, favorite=favorite)
 
 @app.route('/users/<int:user_id>/delete', methods=["POST"])
+@cross_origin()
 def delete_user(user_id):
     """ Deletes a user """
     if 'user_id' not in session:
