@@ -8,12 +8,13 @@ from keys import key
 from populartimes import get_id
 import datetime
 import os
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext'
 
 app = Flask(__name__)
-CORS(app, resources=f'/users/*') # enable CORS 
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', "postgres:///covid_lt")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
@@ -89,6 +90,7 @@ def logout():
 
 ##################### User's FAVORITE LISTS PAGE and SEARCH FORM ####################################
 @app.route('/users/<int:user_id>', methods=["GET", "POST"])
+@cross_origin()
 def show_favorites(user_id):
     """ Shows a users lists of favorites & button to search form"""
 
