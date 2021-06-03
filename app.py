@@ -104,6 +104,7 @@ def show_favorites(user_id):
     return render_template('favorites.html', user=user, favorites=favorites, form=form, button='Go To Search Form')
 
 @app.route('/users/<int:user_id>/search', methods=["GET", "POST"])
+@cross_origin()
 def get_search_form(user_id):
     """ Shows search form and process it """
 
