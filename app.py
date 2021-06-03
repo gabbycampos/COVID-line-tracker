@@ -128,11 +128,11 @@ def get_search_form(user_id):
             today = datetime.datetime.today().weekday()
             day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
             wait_time = round(day / 2)
-            print('hello**********************************************')
             print('wait time', wait_time)
             return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
 
-        except IntegrityError:
+        except:
+            print('hello**********************************************')
             db.session.rollback()
 
 
