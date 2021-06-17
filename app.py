@@ -127,16 +127,15 @@ def get_search_form(user_id):
         place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
 
         db.session.add(place)
-      
-            print('try***************************')
-            db.session.commit()
-            google = result['place_id']
-            time_resp = populartimes.get_id(f"{key}", google)
-            today = datetime.datetime.today().weekday()
-            day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
-            wait_time = round(day / 2)
-            print('wait time', wait_time)
-            return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
+        
+        db.session.commit()
+        google = result['place_id']
+        time_resp = populartimes.get_id(f"{key}", google)
+        today = datetime.datetime.today().weekday()
+        day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
+        wait_time = round(day / 2)
+        print('wait time', wait_time)
+        return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
 
       
             # print('hello**********************************************')
