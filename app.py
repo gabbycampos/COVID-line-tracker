@@ -5,7 +5,8 @@ from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm, 
 from werkzeug.exceptions import Unauthorized
 import requests
 from keys import key 
-from populartimes import get_id
+# from populartimes import get_id
+import populartimes
 import datetime
 import os
 from flask_cors import CORS, cross_origin
@@ -126,19 +127,20 @@ def get_search_form(user_id):
         place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
 
         db.session.add(place)
-        try:
+      
+            print('try***************************')
             db.session.commit()
             google = result['place_id']
-            time_resp = get_id(f"{key}", google)
+            time_resp = populartimes.get_id(f"{key}", google)
             today = datetime.datetime.today().weekday()
             day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
             wait_time = round(day / 2)
             print('wait time', wait_time)
             return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
 
-        except:
-            print('hello**********************************************')
-            db.session.rollback()
+      
+            # print('hello**********************************************')
+            # db.session.rollback()
 
 
         return render_template('/results.html', form=form, place=place, user=user, button="Search")
