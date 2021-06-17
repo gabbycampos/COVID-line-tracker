@@ -5,17 +5,13 @@ from forms import RegisterForm, LoginForm, FavoriteForm, DeleteForm, PlaceForm, 
 from werkzeug.exceptions import Unauthorized
 import requests
 from keys import key 
-# from populartimes import get_id
-import populartimes
+from populartimes import get_id
 import datetime
 import os
-from flask_cors import CORS, cross_origin
 
 API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext'
 
 app = Flask(__name__)
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', "postgres:///covid_lt")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
@@ -91,7 +87,6 @@ def logout():
 
 ##################### User's FAVORITE LISTS PAGE and SEARCH FORM ####################################
 @app.route('/users/<int:user_id>', methods=["GET", "POST"])
-@cross_origin()
 def show_favorites(user_id):
     """ Shows a users lists of favorites & button to search form"""
 
@@ -105,7 +100,6 @@ def show_favorites(user_id):
     return render_template('favorites.html', user=user, favorites=favorites, form=form, button='Go To Search Form')
 
 @app.route('/users/<int:user_id>/search', methods=["GET", "POST"])
-@cross_origin()
 def get_search_form(user_id):
     """ Shows search form and process it """
 
@@ -127,19 +121,19 @@ def get_search_form(user_id):
         place = Place(name=result['name'], address=result['address'], google_id=result['place_id'])
 
         db.session.add(place)
-        
-        db.session.commit()
-        google = result['place_id']
-        time_resp = populartimes.get_id(f"{key}", google)
-        today = datetime.datetime.today().weekday()
-        day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
-        wait_time = round(day / 2)
-        print('wait time', wait_time)
-        return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
+        try:
+            db.session.commit()
+            google = result['place_id']
+            time_resp = get_id(f"{key}", google)
+            today = datetime.datetime.today().weekday()
+            day = time_resp['populartimes'][today]['data'][datetime.datetime.now().hour]
+            wait_time = round(day / 2)
+            print('wait time', wait_time)
+            return render_template('/results.html', form=form, place=place, user=user, wait_time=wait_time, button="Search")
 
-      
-            # print('hello**********************************************')
-            # db.session.rollback()
+        except:
+            print('hello**********************************************')
+            db.session.rollback()
 
 
         return render_template('/results.html', form=form, place=place, user=user, button="Search")
@@ -172,7 +166,6 @@ def add_list(user_id):
     return render_template('new_list.html', form=form, user=user, button="Add")
 
 @app.route('/users/<int:user_id>/lists/<int:favorite_id>', methods=['GET', 'POST'])
-@cross_origin()
 def list_details(favorite_id, user_id):
     """ Shows a users list details"""
     form = FavoriteForm()
@@ -183,7 +176,6 @@ def list_details(favorite_id, user_id):
     return render_template('list_details.html', favorite=favorite, form=form, favList=favList, user=user)
 
 @app.route('/users/<int:user_id>/add_to_list', methods=['GET', 'POST'])
-@cross_origin()
 def list_choices(user_id):
     """ Shows list choices and add to list. """
     form = AddToList()
@@ -205,7 +197,6 @@ def list_choices(user_id):
 
 ########################### DELETE & EDIT ROUTES #################################################
 @app.route('/users/<int:user_id>/delete/<int:favorite_id>', methods=["GET", "POST"])
-@cross_origin()
 def delete_favorites(user_id, favorite_id):
     """ Deletes a favorite list"""
     if session.get('user_id'):
@@ -219,7 +210,6 @@ def delete_favorites(user_id, favorite_id):
         return redirect('/login')
 
 @app.route('/users/<int:user_id>/edit/<int:favorite_id>', methods=["GET", "POST"])
-@cross_origin()
 def edit_favorite(user_id, favorite_id):
     """ Edits a list """
     if 'user_id' not in session:
@@ -236,7 +226,6 @@ def edit_favorite(user_id, favorite_id):
     return render_template('edit_list.html', button='Edit', form=form, favorite=favorite)
 
 @app.route('/users/<int:user_id>/delete', methods=["POST"])
-@cross_origin()
 def delete_user(user_id):
     """ Deletes a user """
     if 'user_id' not in session:
