@@ -20,8 +20,8 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'covidsecretapp')
 
 connect_db(app)
 # if using local server and want to drop/add tables, use code below:
-# db.drop_all()
-# db.create_all()
+db.drop_all()
+db.create_all()
 
 #################### HOME PAGE  ############################
 @app.route('/')
